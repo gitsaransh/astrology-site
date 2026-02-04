@@ -162,24 +162,6 @@ ul {
     letter-spacing: 1px;
 }
 
-.logo .suffix {
-    font-size: 0.9rem;
-    color: var(--text-light);
-    display: block;
-    font-weight: 400;
-    margin-top: -5px;
-    letter-spacing: 2px;
-}
-
-@media (min-width: 768px) {
-    .logo .suffix {
-        display: inline;
-        margin-left: 10px;
-        font-size: 1.1rem;
-        margin-top: 0;
-    }
-}
-
 .nav-links {
     display: flex;
     gap: var(--spacing-md);
