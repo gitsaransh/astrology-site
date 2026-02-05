@@ -390,6 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.querySelector('.close-modal');
     const bookBtns = document.querySelectorAll('.btn-primary, .sticky-cta, .btn-nav');
     const packageSelect = document.getElementById('package');
+    const bookingForm = document.getElementById('booking-form');
 
     // Step Logic
     const step1 = document.getElementById('step-1');
@@ -397,12 +398,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNext = document.getElementById('btn-next');
     const btnBack = document.getElementById('btn-back');
 
-    function resetModal() {
+    function showStep1() {
         if (step1 && step2) {
             step1.style.display = 'block';
             step2.style.display = 'none';
         }
+    }
+
+    function resetAndCloseModal() {
+        showStep1();
         if (bookingForm) bookingForm.reset();
+        modal.style.display = 'none';
     }
 
     // Filter book buttons
@@ -421,28 +427,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             packageSelect.value = selectedValue;
 
-            // Open Modal
-            resetModal();
+            // Open Modal - show step 1 but DON'T reset form
+            showStep1();
             modal.style.display = 'flex';
         });
     });
 
     closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
-        resetModal();
+        resetAndCloseModal();
     });
 
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.style.display = 'none';
-            resetModal();
+            resetAndCloseModal();
         }
     });
 
     // Step Navigation
     if (btnNext) {
         btnNext.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent form submission or reload
+            if (e) e.preventDefault();
+            if (e) e.stopPropagation();
+
+            console.log('Next button clicked');
 
             // Simple Validation for Step 1
             const requiredIds = ['name', 'phone', 'dob', 'tob-hour', 'tob-min', 'pob'];
@@ -453,11 +460,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     isValid = false;
                     el.style.borderColor = 'red';
                 } else if (el) {
-                    el.style.borderColor = 'var(--border-color)';
+                    el.style.borderColor = '';
                 }
             });
 
+            console.log('Validation result:', isValid);
+
             if (isValid) {
+                console.log('Showing step 2');
                 step1.style.display = 'none';
                 step2.style.display = 'block';
             }
@@ -465,43 +475,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (btnBack) {
-        btnBack.addEventListener('click', () => {
+        btnBack.addEventListener('click', (e) => {
+            if (e) e.preventDefault();
             step2.style.display = 'none';
             step1.style.display = 'block';
         });
     }
 
     // Handle Form Submission - Redirect to WhatsApp
-    const bookingForm = document.getElementById('booking-form');
-    bookingForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-        // Get Values
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const dob = document.getElementById('dob').value;
-        const pob = document.getElementById('pob').value;
-        const packageChoice = document.getElementById('package').options[document.getElementById('package').selectedIndex].text;
+            // Get Values
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const dob = document.getElementById('dob').value;
+            const pob = document.getElementById('pob').value;
+            const packageChoice = document.getElementById('package').options[document.getElementById('package').selectedIndex].text;
 
-        // Time Values
-        const tHour = document.getElementById('tob-hour').value;
-        const tMin = document.getElementById('tob-min').value;
-        const tAmpm = document.getElementById('tob-ampm').value;
-        const tob = `${tHour}:${tMin} ${tAmpm}`;
+            // Time Values
+            const tHour = document.getElementById('tob-hour').value;
+            const tMin = document.getElementById('tob-min').value;
+            const tAmpm = document.getElementById('tob-ampm').value;
+            const tob = `${tHour}:${tMin} ${tAmpm}`;
 
-        // Pref Values
-        const prefDate = document.getElementById('pref-date').value;
-        const prefTime = document.getElementById('pref-time').value;
+            // Pref Values
+            const prefDate = document.getElementById('pref-date').value;
+            const prefTime = document.getElementById('pref-time').value;
 
-        // Construct Message
-        const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob} (${tob})\n*Place of Birth:* ${pob}\n\n*Preferred Date:* ${prefDate}\n*Preferred Time:* ${prefTime}\n\nPlease let me know the payment details.`;
+            // Construct Message
+            const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob} (${tob})\n*Place of Birth:* ${pob}\n\n*Preferred Date:* ${prefDate}\n*Preferred Time:* ${prefTime}\n\nPlease let me know the payment details.`;
 
-        // Encode and Redirect
-        const whatsappUrl = `https://wa.me/919967619656?text=${encodeURIComponent(message)}`;
+            // Encode and Redirect
+            const whatsappUrl = `https://wa.me/919967619656?text=${encodeURIComponent(message)}`;
 
-        window.open(whatsappUrl, '_blank');
-        modal.style.display = 'none';
-        resetModal();
-    });
+            window.open(whatsappUrl, '_blank');
+            resetAndCloseModal();
+        });
+    }
 
 });
