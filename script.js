@@ -293,8 +293,6 @@ const translations = {
     }
 };
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // Elements
@@ -387,23 +385,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
-
     // Modal Logic
     const modal = document.getElementById('booking-modal');
     const closeBtn = document.querySelector('.close-modal');
     const bookBtns = document.querySelectorAll('.btn-primary, .sticky-cta, .btn-nav');
     const packageSelect = document.getElementById('package');
 
-    // Filter book buttons to exclude those that are actually just links (if any)
-    // In our case, all 'Book Now' buttons should trigger the modal
+    // Step Logic
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const btnNext = document.getElementById('btn-next');
+    const btnBack = document.getElementById('btn-back');
+
+    function resetModal() {
+        if (step1 && step2) {
+            step1.style.display = 'block';
+            step2.style.display = 'none';
+        }
+        if (bookingForm) bookingForm.reset();
+    }
+
+    // Filter book buttons
     bookBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Prevent default anchor behavior
             e.preventDefault();
 
-            // Check if it's the specific specific package button
-            // We can determine package based on where the button is
+            // Determine package based on button
             let selectedValue = 'standard';
             if (btn.closest('.pricing-card')) {
                 const card = btn.closest('.pricing-card');
@@ -412,23 +419,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (title === 'plan_prem') selectedValue = 'premium';
             }
 
-            // Set value
             packageSelect.value = selectedValue;
 
             // Open Modal
+            resetModal();
             modal.style.display = 'flex';
         });
     });
 
     closeBtn.addEventListener('click', () => {
         modal.style.display = 'none';
+        resetModal();
     });
 
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
+            resetModal();
         }
     });
+
+    // Step Navigation
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            // Simple Validation for Step 1
+            const requiredIds = ['name', 'phone', 'dob', 'tob-hour', 'tob-min', 'pob'];
+            let isValid = true;
+            requiredIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.value) {
+                    isValid = false;
+                    el.style.borderColor = 'red';
+                } else if (el) {
+                    el.style.borderColor = 'var(--border-color)';
+                }
+            });
+
+            if (isValid) {
+                step1.style.display = 'none';
+                step2.style.display = 'block';
+            }
+        });
+    }
+
+    if (btnBack) {
+        btnBack.addEventListener('click', () => {
+            step2.style.display = 'none';
+            step1.style.display = 'block';
+        });
+    }
 
     // Handle Form Submission - Redirect to WhatsApp
     const bookingForm = document.getElementById('booking-form');
@@ -448,15 +487,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const tAmpm = document.getElementById('tob-ampm').value;
         const tob = `${tHour}:${tMin} ${tAmpm}`;
 
+        // Pref Values
+        const prefDate = document.getElementById('pref-date').value;
+        const prefTime = document.getElementById('pref-time').value;
+
         // Construct Message
-        const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob}\n*Time of Birth:* ${tob}\n*Place of Birth:* ${pob}\n\nPlease let me know the payment details.`;
+        const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob} (${tob})\n*Place of Birth:* ${pob}\n\n*Preferred Date:* ${prefDate}\n*Preferred Time:* ${prefTime}\n\nPlease let me know the payment details.`;
 
         // Encode and Redirect
         const whatsappUrl = `https://wa.me/919967619656?text=${encodeURIComponent(message)}`;
 
         window.open(whatsappUrl, '_blank');
         modal.style.display = 'none';
-        bookingForm.reset();
+        resetModal();
     });
 
 });
