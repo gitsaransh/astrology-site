@@ -418,12 +418,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle Form Submission (Dummy for now)
+    // Handle Form Submission - Redirect to WhatsApp
     const bookingForm = document.getElementById('booking-form');
     bookingForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        alert('Thank you! In a real integration, this would redirect to the Payment Gateway (Razorpay/Stripe) with the details.');
+
+        // Get Values
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const dob = document.getElementById('dob').value;
+        const pob = document.getElementById('pob').value;
+        const packageChoice = document.getElementById('package').options[document.getElementById('package').selectedIndex].text;
+
+        // Time Values
+        const tHour = document.getElementById('tob-hour').value;
+        const tMin = document.getElementById('tob-min').value;
+        const tAmpm = document.getElementById('tob-ampm').value;
+        const tob = `${tHour}:${tMin} ${tAmpm}`;
+
+        // Construct Message
+        const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob}\n*Time of Birth:* ${tob}\n*Place of Birth:* ${pob}\n\nPlease let me know the payment details.`;
+
+        // Encode and Redirect
+        const whatsappUrl = `https://wa.me/919967619656?text=${encodeURIComponent(message)}`;
+
+        window.open(whatsappUrl, '_blank');
         modal.style.display = 'none';
+        bookingForm.reset();
     });
 
 });

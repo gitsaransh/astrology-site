@@ -101,6 +101,28 @@
     transition: border-color 0.3s;
 }
 
+/* Time Input Specific Styles */
+.time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.time-input-group input {
+    text-align: center;
+    padding: 12px 5px !important;
+    /* Force tighter padding */
+}
+
+.time-input-group select {
+    padding: 12px 8px !important;
+}
+
+.time-separator {
+    font-weight: bold;
+    color: var(--primary-dark);
+}
+
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
