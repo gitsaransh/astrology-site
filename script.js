@@ -441,7 +441,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Step Navigation
     if (btnNext) {
-        btnNext.addEventListener('click', () => {
+        btnNext.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent form submission or reload
+
             // Simple Validation for Step 1
             const requiredIds = ['name', 'phone', 'dob', 'tob-hour', 'tob-min', 'pob'];
             let isValid = true;
