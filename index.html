@@ -13,6 +13,7 @@
         href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Oriya:wght@400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal.css">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -316,6 +317,48 @@
             </div>
         </div>
     </footer>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 data-i18n="modal_title">Book Your Consultation</h2>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="name" data-i18n="label_name">Full Name</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone" data-i18n="label_phone">Phone Number (WhatsApp)</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="dob" data-i18n="label_dob">Date of Birth</label>
+                        <input type="date" id="dob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tob" data-i18n="label_tob">Time of Birth</label>
+                        <input type="time" id="tob" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="pob" data-i18n="label_pob">Place of Birth (City, State)</label>
+                    <input type="text" id="pob" required>
+                </div>
+                <div class="form-group">
+                    <label for="package" data-i18n="label_package">Selected Package</label>
+                    <select id="package">
+                        <option value="standard">Standard Consultation - ₹499</option>
+                        <option value="detailed">Detailed Report - ₹999</option>
+                        <option value="premium">Premium Annual - ₹4999</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary full-width" data-i18n="btn_proceed_pay">Proceed to
+                    Payment</button>
+            </form>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

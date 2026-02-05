@@ -81,7 +81,17 @@ const translations = {
 
         footer_desc: "Guiding you towards light and clarity.",
         sticky_cta: "Book Your Consultation Today",
-        btn_book_now: "Book Now"
+        btn_book_now: "Book Now",
+
+        // Modal Translations
+        modal_title: "Book Your Consultation",
+        label_name: "Full Name",
+        label_phone: "Phone Number (WhatsApp)",
+        label_dob: "Date of Birth",
+        label_tob: "Time of Birth",
+        label_pob: "Place of Birth (City, State)",
+        label_package: "Selected Package",
+        btn_proceed_pay: "Proceed to Payment"
     },
     hi: {
         nav_about: "परिचय",
@@ -165,7 +175,17 @@ const translations = {
 
         footer_desc: "आपको प्रकाश और स्पष्टता की ओर ले जाना।",
         sticky_cta: "अपना परामर्श आज ही बुक करें",
-        btn_book_now: "बुक करें"
+        btn_book_now: "बुक करें",
+
+        // Modal Translations
+        modal_title: "परामर्श बुक करें",
+        label_name: "पूरा नाम",
+        label_phone: "फ़ोन नंबर (व्हाट्सएप)",
+        label_dob: "जन्म तारीख",
+        label_tob: "जन्म समय",
+        label_pob: "जन्म स्थान",
+        label_package: "चयनित पैकेज",
+        btn_proceed_pay: "भुगतान के लिए आगे बढ़ें"
     },
     od: {
         nav_about: "ପରିଚୟ",
@@ -249,7 +269,17 @@ const translations = {
 
         footer_desc: "ଆପଣଙ୍କୁ ଆଲୋକ ଏବଂ ସ୍ପଷ୍ଟତା ଆଡକୁ ନେଇଯିବା।",
         sticky_cta: "ଆଜି ହିଁ ପରାମର୍ଶ ବୁକ୍ କରନ୍ତୁ",
-        btn_book_now: "ବୁକ୍ କରନ୍ତୁ"
+        btn_book_now: "ବୁକ୍ କରନ୍ତୁ",
+
+        // Modal Translations
+        modal_title: "ପରାମର୍ଶ ବୁକ୍ କରନ୍ତୁ",
+        label_name: "ପୂର୍ଣ୍ଣ ନାମ",
+        label_phone: "ଫୋନ୍ ନମ୍ବର (ହ୍ୱାଟସ୍ ଆପ୍)",
+        label_dob: "ଜନ୍ମ ତାରିଖ",
+        label_tob: "ଜନ୍ମ ସମୟ",
+        label_pob: "ଜନ୍ମ ସ୍ଥାନ",
+        label_package: "ଚୟନ କରାଯାଇଥିବା ପ୍ୟାକେଜ୍",
+        btn_proceed_pay: "ପେମେଣ୍ଟ ପାଇଁ ଆଗକୁ ବଢନ୍ତୁ"
     }
 };
 
@@ -343,6 +373,57 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             navbar.style.boxShadow = "none";
         }
+    });
+
+
+
+    // Modal Logic
+    const modal = document.getElementById('booking-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    const bookBtns = document.querySelectorAll('.btn-primary, .sticky-cta, .btn-nav');
+    const packageSelect = document.getElementById('package');
+
+    // Filter book buttons to exclude those that are actually just links (if any)
+    // In our case, all 'Book Now' buttons should trigger the modal
+    bookBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Prevent default anchor behavior
+            e.preventDefault();
+
+            // Check if it's the specific specific package button
+            // We can determine package based on where the button is
+            let selectedValue = 'standard';
+            if (btn.closest('.pricing-card')) {
+                const card = btn.closest('.pricing-card');
+                const title = card.querySelector('h3').getAttribute('data-i18n');
+                if (title === 'plan_det') selectedValue = 'detailed';
+                if (title === 'plan_prem') selectedValue = 'premium';
+            }
+
+            // Set value
+            packageSelect.value = selectedValue;
+
+            // Open Modal
+            modal.style.display = 'flex';
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle Form Submission (Dummy for now)
+    const bookingForm = document.getElementById('booking-form');
+    bookingForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Thank you! In a real integration, this would redirect to the Payment Gateway (Razorpay/Stripe) with the details.');
+        modal.style.display = 'none';
     });
 
 });
