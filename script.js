@@ -91,6 +91,10 @@ const translations = {
         label_tob: "Time of Birth",
         label_pob: "Place of Birth (City, State)",
         label_package: "Selected Package",
+        label_pref_date: "Preferred Date",
+        label_pref_time: "Preferred Time Slot",
+        btn_next: "Next",
+        btn_back: "Back",
         btn_proceed_pay: "Proceed to Payment"
     },
     hi: {
@@ -185,6 +189,10 @@ const translations = {
         label_tob: "जन्म समय",
         label_pob: "जन्म स्थान",
         label_package: "चयनित पैकेज",
+        label_pref_date: "पसंदीदा तारीख",
+        label_pref_time: "पसंदीदा समय",
+        btn_next: "अगला",
+        btn_back: "वापस",
         btn_proceed_pay: "भुगतान के लिए आगे बढ़ें"
     },
     od: {
@@ -270,8 +278,6 @@ const translations = {
         footer_desc: "ଆପଣଙ୍କୁ ଆଲୋକ ଏବଂ ସ୍ପଷ୍ଟତା ଆଡକୁ ନେଇଯିବା।",
         sticky_cta: "ଆଜି ହିଁ ପରାମର୍ଶ ବୁକ୍ କରନ୍ତୁ",
         btn_book_now: "ବୁକ୍ କରନ୍ତୁ",
-
-        // Modal Translations
         modal_title: "ପରାମର୍ଶ ବୁକ୍ କରନ୍ତୁ",
         label_name: "ପୂର୍ଣ୍ଣ ନାମ",
         label_phone: "ଫୋନ୍ ନମ୍ବର (ହ୍ୱାଟସ୍ ଆପ୍)",
@@ -279,9 +285,15 @@ const translations = {
         label_tob: "ଜନ୍ମ ସମୟ",
         label_pob: "ଜନ୍ମ ସ୍ଥାନ",
         label_package: "ଚୟନ କରାଯାଇଥିବା ପ୍ୟାକେଜ୍",
+        label_pref_date: "ପସନ୍ଦର ତାରିଖ",
+        label_pref_time: "ପସନ୍ଦର ସମୟ",
+        btn_next: "ପରବର୍ତ୍ତୀ",
+        btn_back: "ପଛକୁ",
         btn_proceed_pay: "ପେମେଣ୍ଟ ପାଇଁ ଆଗକୁ ବଢନ୍ତୁ"
     }
 };
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
