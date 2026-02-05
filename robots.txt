@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://gitsaransh.github.io/astrology-site/sitemap.xml
