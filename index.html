@@ -325,46 +325,72 @@
             <span class="close-modal">&times;</span>
             <h2 data-i18n="modal_title">Book Your Consultation</h2>
             <form id="booking-form">
-                <div class="form-group">
-                    <label for="name" data-i18n="label_name">Full Name</label>
-                    <input type="text" id="name" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone" data-i18n="label_phone">Phone Number (WhatsApp)</label>
-                    <input type="tel" id="phone" required>
-                </div>
-                <div class="form-row">
+
+                <!-- Step 1Details -->
+                <div id="step-1" class="form-step">
                     <div class="form-group">
-                        <label for="dob" data-i18n="label_dob">Date of Birth</label>
-                        <input type="date" id="dob" required>
+                        <label for="name" data-i18n="label_name">Full Name</label>
+                        <input type="text" id="name" required>
                     </div>
                     <div class="form-group">
-                        <label data-i18n="label_tob">Time of Birth</label>
-                        <div class="time-input-group">
-                            <input type="number" id="tob-hour" min="1" max="12" placeholder="HH" required>
-                            <span class="time-separator">:</span>
-                            <input type="number" id="tob-min" min="0" max="59" placeholder="MM" required>
-                            <select id="tob-ampm">
-                                <option value="AM">AM</option>
-                                <option value="PM">PM</option>
-                            </select>
+                        <label for="phone" data-i18n="label_phone">Phone Number (WhatsApp)</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dob" data-i18n="label_dob">Date of Birth</label>
+                            <input type="date" id="dob" required>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="label_tob">Time of Birth</label>
+                            <div class="time-input-group">
+                                <input type="number" id="tob-hour" min="1" max="12" placeholder="HH" required>
+                                <span class="time-separator">:</span>
+                                <input type="number" id="tob-min" min="0" max="59" placeholder="MM" required>
+                                <select id="tob-ampm">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="pob" data-i18n="label_pob">Place of Birth (City, State)</label>
+                        <input type="text" id="pob" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="package" data-i18n="label_package">Selected Package</label>
+                        <select id="package">
+                            <option value="standard">Standard Consultation - ₹499</option>
+                            <option value="detailed">Detailed Report - ₹999</option>
+                            <option value="premium">Premium Annual - ₹4999</option>
+                        </select>
+                    </div>
+                    <button type="button" id="btn-next" class="btn btn-primary full-width"
+                        data-i18n="btn_next">Next</button>
                 </div>
-                <div class="form-group">
-                    <label for="pob" data-i18n="label_pob">Place of Birth (City, State)</label>
-                    <input type="text" id="pob" required>
+
+                <!-- Step 2 Preferences -->
+                <div id="step-2" class="form-step" style="display: none;">
+                    <div class="form-group">
+                        <label for="pref-date" data-i18n="label_pref_date">Preferred Consultation Date</label>
+                        <input type="date" id="pref-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pref-time" data-i18n="label_pref_time">Preferred Time Slot</label>
+                        <select id="pref-time">
+                            <option value="Morning">Morning (9 AM - 12 PM)</option>
+                            <option value="Afternoon">Afternoon (12 PM - 4 PM)</option>
+                            <option value="Evening">Evening (4 PM - 8 PM)</option>
+                        </select>
+                    </div>
+                    <div class="modal-btn-group">
+                        <button type="button" id="btn-back" class="btn btn-secondary" data-i18n="btn_back">Back</button>
+                        <button type="submit" class="btn btn-primary" data-i18n="btn_proceed_pay">Proceed to
+                            Payment</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="package" data-i18n="label_package">Selected Package</label>
-                    <select id="package">
-                        <option value="standard">Standard Consultation - ₹499</option>
-                        <option value="detailed">Detailed Report - ₹999</option>
-                        <option value="premium">Premium Annual - ₹4999</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary full-width" data-i18n="btn_proceed_pay">Proceed to
-                    Payment</button>
+
             </form>
         </div>
     </div>
