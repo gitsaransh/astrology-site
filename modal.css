@@ -130,6 +130,82 @@
     box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
 }
 
+/* Validation States */
+.form-group input.error,
+.form-group select.error {
+    border-color: #e53e3e;
+    background-color: #fff5f5;
+}
+
+.form-group input.success,
+.form-group select.success {
+    border-color: #38a169;
+    background-color: #f0fff4;
+}
+
+.error-message {
+    color: #e53e3e;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: none;
+    font-weight: 500;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.success-icon {
+    color: #38a169;
+    font-size: 0.9rem;
+    margin-left: 5px;
+    display: none;
+}
+
+.success-icon.show {
+    display: inline;
+}
+
+/* Loading State */
+.btn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-message {
+    text-align: center;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 10px;
+    display: none;
+}
+
+.loading-message.show {
+    display: block;
+}
+
 .full-width {
     width: 100%;
     margin-top: 10px;

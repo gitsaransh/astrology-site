@@ -293,7 +293,43 @@ const translations = {
     }
 };
 
+// AGGRESSIVE FIX for mobile auto-scroll bug
+// Strategy 1: Disable smooth scrolling temporarily
+document.documentElement.style.scrollBehavior = 'auto';
+
+// Strategy 2: Immediate scroll (before anything else)
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+window.scrollTo(0, 0);
+
+// Strategy 3: Remove hash immediately
+if (window.location.hash) {
+    history.replaceState(null, null, window.location.pathname + window.location.search);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Strategy 3: Scroll to top when DOM is ready
+    window.scrollTo(0, 0);
+
+    // Strategy 4: Delayed scroll to override any browser auto-scroll
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+    }, 0);
+
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+    }, 100);
+
+    // Strategy 5: Also on window load (after all resources)
+    window.addEventListener('load', () => {
+        window.scrollTo(0, 0);
+        // Re-enable smooth scrolling after ensuring we're at the top
+        setTimeout(() => {
+            document.documentElement.style.scrollBehavior = 'smooth';
+        }, 200);
+    });
 
     // Elements
     const hamburger = document.querySelector('.hamburger');
@@ -336,6 +372,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (langSelect) {
         langSelect.addEventListener('change', (e) => {
             changeLanguage(e.target.value);
+
+            // Track language change in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'language_change', {
+                    'event_category': 'User Preference',
+                    'event_label': e.target.value,
+                    'value': e.target.value
+                });
+            }
         });
 
         // Check local storage or default to 'en'
@@ -388,7 +433,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Logic
     const modal = document.getElementById('booking-modal');
     const closeBtn = document.querySelector('.close-modal');
-    const bookBtns = document.querySelectorAll('.btn-primary, .sticky-cta, .btn-nav');
+    // FIXED: Removed '.pricing-card .btn-primary' because those are Calendly links, not modal triggers
+    // Only select: sticky CTA, nav button, and hero button
+    const bookBtns = document.querySelectorAll('.sticky-cta, .btn-nav, .hero .btn-primary');
     const packageSelect = document.getElementById('package');
     const bookingForm = document.getElementById('booking-form');
 
@@ -397,6 +444,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const step2 = document.getElementById('step-2');
     const btnNext = document.getElementById('btn-next');
     const btnBack = document.getElementById('btn-back');
+
+    // Set minimum date for preferred consultation date to today
+    const prefDateInput = document.getElementById('pref-date');
+    if (prefDateInput) {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const minDate = `${year}-${month}-${day}`;
+        prefDateInput.setAttribute('min', minDate);
+    }
+
+    // Phone number validation - only allow digits
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', (e) => {
+            // Remove any non-digit characters
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        // Prevent pasting non-numeric content
+        phoneInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            const numericOnly = pastedText.replace(/[^0-9]/g, '');
+            phoneInput.value = numericOnly.substring(0, 10); // Limit to 10 digits
+        });
+    }
 
     function showStep1() {
         if (step1 && step2) {
@@ -411,21 +486,26 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.style.display = 'none';
     }
 
-    // Filter book buttons
+    // Book button click handlers (sticky CTA, nav button, hero button)
     bookBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
 
-            // Determine package based on button
-            let selectedValue = 'standard';
-            if (btn.closest('.pricing-card')) {
-                const card = btn.closest('.pricing-card');
-                const title = card.querySelector('h3').getAttribute('data-i18n');
-                if (title === 'plan_det') selectedValue = 'detailed';
-                if (title === 'plan_prem') selectedValue = 'premium';
-            }
+            // Default to standard package when opening modal from non-pricing buttons
+            packageSelect.value = 'standard';
 
-            packageSelect.value = selectedValue;
+            // Track modal open in Google Analytics
+            if (typeof gtag !== 'undefined') {
+                let buttonLocation = 'unknown';
+                if (btn.classList.contains('sticky-cta')) buttonLocation = 'sticky_cta';
+                else if (btn.classList.contains('btn-nav')) buttonLocation = 'nav_button';
+                else if (btn.closest('.hero')) buttonLocation = 'hero_button';
+
+                gtag('event', 'modal_open', {
+                    'event_category': 'Engagement',
+                    'event_label': buttonLocation
+                });
+            }
 
             // Open Modal - show step 1 but DON'T reset form
             showStep1();
@@ -451,23 +531,109 @@ document.addEventListener('DOMContentLoaded', () => {
 
             console.log('Next button clicked');
 
-            // Simple Validation for Step 1
-            const requiredIds = ['name', 'phone', 'dob', 'tob-hour', 'tob-min', 'pob'];
+            // Enhanced Validation for Step 1
             let isValid = true;
-            requiredIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.value) {
-                    isValid = false;
-                    el.style.borderColor = 'red';
-                } else if (el) {
-                    el.style.borderColor = '';
-                }
-            });
+
+            // Validate Name (letters only, min 2 characters)
+            const nameEl = document.getElementById('name');
+            const nameError = document.getElementById('name-error');
+            const nameRegex = /^[a-zA-Z\s]{2,}$/;
+
+            if (!nameEl.value.trim()) {
+                isValid = false;
+                nameEl.classList.add('error');
+                nameEl.classList.remove('success');
+                nameError.classList.add('show');
+            } else if (!nameRegex.test(nameEl.value.trim())) {
+                isValid = false;
+                nameEl.classList.add('error');
+                nameEl.classList.remove('success');
+                nameError.classList.add('show');
+            } else {
+                nameEl.classList.remove('error');
+                nameEl.classList.add('success');
+                nameError.classList.remove('show');
+            }
+
+            // Validate Phone (exactly 10 digits)
+            const phoneEl = document.getElementById('phone');
+            const phoneError = document.getElementById('phone-error');
+
+            if (!phoneEl.value || phoneEl.value.length !== 10) {
+                isValid = false;
+                phoneEl.classList.add('error');
+                phoneEl.classList.remove('success');
+                phoneError.classList.add('show');
+            } else {
+                phoneEl.classList.remove('error');
+                phoneEl.classList.add('success');
+                phoneError.classList.remove('show');
+            }
+
+            // Validate Date of Birth
+            const dobEl = document.getElementById('dob');
+            const dobError = document.getElementById('dob-error');
+
+            if (!dobEl.value) {
+                isValid = false;
+                dobEl.classList.add('error');
+                dobEl.classList.remove('success');
+                dobError.classList.add('show');
+            } else {
+                dobEl.classList.remove('error');
+                dobEl.classList.add('success');
+                dobError.classList.remove('show');
+            }
+
+            // Validate Time of Birth
+            const tobHourEl = document.getElementById('tob-hour');
+            const tobMinEl = document.getElementById('tob-min');
+            const tobError = document.getElementById('tob-error');
+
+            const hour = parseInt(tobHourEl.value);
+            const min = parseInt(tobMinEl.value);
+
+            if (!tobHourEl.value || !tobMinEl.value || hour < 1 || hour > 12 || min < 0 || min > 59) {
+                isValid = false;
+                tobHourEl.classList.add('error');
+                tobMinEl.classList.add('error');
+                tobError.classList.add('show');
+            } else {
+                tobHourEl.classList.remove('error');
+                tobMinEl.classList.remove('error');
+                tobHourEl.classList.add('success');
+                tobMinEl.classList.add('success');
+                tobError.classList.remove('show');
+            }
+
+            // Validate Place of Birth
+            const pobEl = document.getElementById('pob');
+            const pobError = document.getElementById('pob-error');
+
+            if (!pobEl.value.trim() || pobEl.value.trim().length < 2) {
+                isValid = false;
+                pobEl.classList.add('error');
+                pobEl.classList.remove('success');
+                pobError.classList.add('show');
+            } else {
+                pobEl.classList.remove('error');
+                pobEl.classList.add('success');
+                pobError.classList.remove('show');
+            }
 
             console.log('Validation result:', isValid);
 
             if (isValid) {
                 console.log('Showing step 2');
+
+                // Track form progression in Google Analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'form_step_complete', {
+                        'event_category': 'Form',
+                        'event_label': 'step_1_to_step_2'
+                    });
+                }
+
                 step1.style.display = 'none';
                 step2.style.display = 'block';
             }
@@ -486,6 +652,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bookingForm) {
         bookingForm.addEventListener('submit', (e) => {
             e.preventDefault();
+
+            // Validate preferred date (must be in future)
+            const prefDateEl = document.getElementById('pref-date');
+            const prefDateError = document.getElementById('pref-date-error');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(prefDateEl.value);
+
+            if (!prefDateEl.value || selectedDate < today) {
+                prefDateEl.classList.add('error');
+                prefDateError.classList.add('show');
+                return;
+            } else {
+                prefDateEl.classList.remove('error');
+                prefDateError.classList.remove('show');
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById('btn-submit');
+            const loadingMsg = document.getElementById('loading-msg');
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            loadingMsg.classList.add('show');
 
             // Get Values
             const name = document.getElementById('name').value;
@@ -507,11 +696,34 @@ document.addEventListener('DOMContentLoaded', () => {
             // Construct Message
             const message = `Namaste, I would like to book a consultation.\n\n*Package:* ${packageChoice}\n*Name:* ${name}\n*Phone:* ${phone}\n*DOB:* ${dob} (${tob})\n*Place of Birth:* ${pob}\n\n*Preferred Date:* ${prefDate}\n*Preferred Time:* ${prefTime}\n\nPlease let me know the payment details.`;
 
-            // Encode and Redirect
+            // Encode and Redirect (with delay for UX)
             const whatsappUrl = `https://wa.me/919967619656?text=${encodeURIComponent(message)}`;
 
-            window.open(whatsappUrl, '_blank');
-            resetAndCloseModal();
+            // Track form submission in Google Analytics
+            const packageValue = document.getElementById('package').value;
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'booking_submit', {
+                    'event_category': 'Conversion',
+                    'event_label': packageValue,
+                    'value': packageValue === 'standard' ? 499 : packageValue === 'detailed' ? 999 : 4999
+                });
+            }
+
+            setTimeout(() => {
+                // Track WhatsApp redirect
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'whatsapp_redirect', {
+                        'event_category': 'Conversion',
+                        'event_label': packageValue
+                    });
+                }
+
+                window.open(whatsappUrl, '_blank');
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                loadingMsg.classList.remove('show');
+                resetAndCloseModal();
+            }, 800);
         });
     }
 

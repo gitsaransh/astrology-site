@@ -699,7 +699,11 @@ ul {
     }
 
     .pricing-card.featured {
+        /* FIXED: Removed transform scale on mobile to prevent auto-scroll */
+        /* Mobile browsers were auto-focusing on the scaled element */
         transform: scale(1);
+        border: 2px solid var(--accent);
+        /* Keep the visual highlight */
     }
 
     .nav-links {
